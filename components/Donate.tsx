@@ -190,7 +190,7 @@ export function Donate({ selectedAddress }: DonateProps) {
   useEffect(() => {
     console.log("contextAccounts[0]:", contextAccounts[0]);
     getAssetMetadata();
-  }, []);
+  }, [tempAddress]);
 
   return (
     <div className="w-full bg-white/80 backdrop-blur-md rounded-2xl">
