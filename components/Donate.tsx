@@ -32,13 +32,13 @@ interface DonateProps {
 }
 
 export function Donate({ selectedAddress }: DonateProps) {
-  const { client, accounts, contextAccounts, walletConnected } =
-    useUpProvider();
+  const { client, accounts, contextAccounts, walletConnected } = useUpProvider();
   const [amount, setAmount] = useState<number>(minAmount);
   const [error, setError] = useState("");
   const recipientAddress = selectedAddress || contextAccounts[0];
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log("contextAccounts[0]:", contextAccounts[0]);
   const validateAmount = useCallback((value: number) => {
     if (value < minAmount) {
       setError(`Amount must be at least ${minAmount} LYX.`);
