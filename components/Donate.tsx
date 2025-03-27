@@ -42,10 +42,10 @@ export function Donate({ selectedAddress }: DonateProps) {
   const {
     //
     // 
-    client, 
-    accounts, 
+    //client, 
+    //accounts, 
     contextAccounts,
-    walletConnected 
+    //walletConnected 
   } = useUpProvider();
   //const [amount, setAmount] = useState<number>(minAmount);
   //const [error, setError] = useState("");
