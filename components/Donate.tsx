@@ -26,7 +26,7 @@ import { waitForTransactionReceipt } from "viem/actions";
 import { ethers } from 'ethers';
 //import { ERC725 } from '@erc725/erc725.js';
 
-require("dotenv").config();
+//require("dotenv").config();
 
 const minAmount = 1.0;
 const maxAmount = 1000;
@@ -131,6 +131,7 @@ export function Donate({ selectedAddress }: DonateProps) {
     console.log("readSymbolFunction:", ethers.toUtf8String(readSymbolFunction));
 
     const tokensIdFrom = await readContract.tokenIdsOf(tempAddress);
+    setTokensIdFrom(tokensIdFrom);
     console.log("tokensIdFrom:", tokensIdFrom);
     console.log("tokensIdFrom.lenght:", tokensIdFrom.length);
   }
