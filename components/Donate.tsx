@@ -40,13 +40,18 @@ interface DonateProps {
 
 export function Donate({ selectedAddress }: DonateProps) {
   const {
-    //client, accounts, 
+    //
+    // 
+    client, 
+    accounts, 
     contextAccounts,
-    //walletConnected 
+    walletConnected 
   } = useUpProvider();
   //const [amount, setAmount] = useState<number>(minAmount);
   //const [error, setError] = useState("");
   const recipientAddress = selectedAddress || contextAccounts[0];
+  console.log("recipientAddress:", recipientAddress);
+  console.log("contextAccounts[0]:", contextAccounts[0]);
   //const [isLoading, setIsLoading] = useState(false);
   const [tokensIdFrom, setTokensIdFrom] = useState<string[]>([]);
   const [tokenName, setTokenName] = useState<string>("");
