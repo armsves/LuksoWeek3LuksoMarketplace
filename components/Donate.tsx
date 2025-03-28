@@ -337,7 +337,7 @@ export function Donate({ selectedAddress }: DonateProps) {
 
                   const newBlob = await response.json();
                   console.log("Uploaded file response:", newBlob);
-
+                  console.log("Uploaded file URL:", newBlob.url);
                   setCoverImage(newBlob.url);
                 } catch (error) {
                   console.error("Error during file upload:", error);
@@ -358,7 +358,7 @@ export function Donate({ selectedAddress }: DonateProps) {
             ) : (
               <>
                 {coverImage ? (
-                  <div className="relative w-full h-full">
+                  <div className="relative w-full h-full">{coverImage}
                     <Image src={coverImage} alt="uploaded image" fill className="rounded ring-1 ring-gray-900/5 cover" />
                   </div>
                 ) : (
