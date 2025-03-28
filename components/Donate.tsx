@@ -440,8 +440,10 @@ export function Donate({ selectedAddress }: DonateProps) {
                   </div>
                   <div className="flex flex-row items-center justify-between">
                     <p className="text-gray-900 font-semibold">Hash:</p>
-                    <span className="text-gray-700">{token.hash}</span>
-                  </div>
+                    <span className="text-gray-700">
+                      {token.hash.slice(0, 3)}...{token.hash.slice(-4)}
+                    </span>                  
+                    </div>
                 </div>
               ))}
             </div>
