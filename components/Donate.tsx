@@ -321,7 +321,14 @@ export function Donate({ selectedAddress }: DonateProps) {
                   `/api/upload?filename=${file.name}`,
                   { method: 'POST', body: file, },
                 );
+                if (!response.ok) {
+                  console.error('Upload failed:', response.statusText);
+                  setImageUploading(false);
+                  return;
+                }
+                console.log("response:", response);
                 const newBlob = await response.json();
+                console.log("newBlob:", newBlob);
                 setBlob(newBlob);
                 setCoverImage(newBlob.url);
                 setImageUploading(false);
