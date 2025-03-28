@@ -284,7 +284,7 @@ export function Donate({ selectedAddress }: DonateProps) {
 
   const [coverImage, setCoverImage] = useState<string>("");
   const [imageUploading, setImageUploading] = useState<boolean>(false);
-  const [setBlob] = useState<any>(null);
+  //const [setBlob] = useState<any>(null);
 
   return (
     <div className="w-full bg-white/80 backdrop-blur-md rounded-2xl">
@@ -314,24 +314,36 @@ export function Donate({ selectedAddress }: DonateProps) {
               type="file"
               accept="image/*"
               onChange={async (e) => {
-                if (!e.target.files || e.target.files.length === 0) { return; }
-                const file = e.target.files[0];
-                setImageUploading(true);
-                const response = await fetch(
-                  `/api/upload?filename=${file.name}`,
-                  { method: 'POST', body: file, },
-                );
-                if (!response.ok) {
-                  console.error('Upload failed:', response.statusText);
+                try {
+                  if (!e.target.files || e.target.files.length === 0) {
+                    console.error("No file selected");
+                    return;
+                  }
+                  const file = e.target.files[0];
+                  console.log("Selected file:", file);
+              
+                  setImageUploading(true);
+              
+                  const response = await fetch(
+                    `/api/upload?filename=${file.name}`,
+                    { method: 'POST', body: file }
+                  );
+              
+                  if (!response.ok) {
+                    console.error('Upload failed:', response.statusText);
+                    setImageUploading(false);
+                    return;
+                  }
+              
+                  const newBlob = await response.json();
+                  console.log("Uploaded file response:", newBlob);
+              
+                  setCoverImage(newBlob.url);
+                } catch (error) {
+                  console.error("Error during file upload:", error);
+                } finally {
                   setImageUploading(false);
-                  return;
                 }
-                console.log("response:", response);
-                const newBlob = await response.json();
-                console.log("newBlob:", newBlob);
-                setBlob(newBlob);
-                setCoverImage(newBlob.url);
-                setImageUploading(false);
               }}
               //disabled={imageUploading}
               className="opacity-0 w-full h-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
