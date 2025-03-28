@@ -287,7 +287,7 @@ export function Donate({ selectedAddress }: DonateProps) {
   //const [setBlob] = useState<any>(null);
 
   return (
-    <div className="w-full bg-white/80 backdrop-blur-md rounded-2xl">
+    <div className="w-full max-w-[650px] bg-white/80 backdrop-blur-md rounded-2xl mx-auto">
       <div className="rounded-xl mb-4">
         <p className="text-gray-700 font-semibold">UP Address:</p>
         <p className="text-gray-900">{recipientAddress}</p>
@@ -308,7 +308,7 @@ export function Donate({ selectedAddress }: DonateProps) {
             required
           />
         </div>*/}
-        <div className="rounded bg-starloom-gray2 bg-opacity-10 text-starloom-white">
+        <div className="rounded">
           <label className="cursor-pointer w-full h-full">
             <input
               type="file"
@@ -321,23 +321,23 @@ export function Donate({ selectedAddress }: DonateProps) {
                   }
                   const file = e.target.files[0];
                   console.log("Selected file:", file);
-              
+
                   setImageUploading(true);
-              
+
                   const response = await fetch(
                     `/api/upload?filename=${file.name}`,
                     { method: 'POST', body: file }
                   );
-              
+
                   if (!response.ok) {
                     console.error('Upload failed:', response.statusText);
                     setImageUploading(false);
                     return;
                   }
-              
+
                   const newBlob = await response.json();
                   console.log("Uploaded file response:", newBlob);
-              
+
                   setCoverImage(newBlob.url);
                 } catch (error) {
                   console.error("Error during file upload:", error);
