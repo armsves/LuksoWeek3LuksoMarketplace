@@ -30,7 +30,12 @@ import { ethers } from 'ethers';
 import Image from "next/image";
 //import { write } from "fs";
 //import { ERC725 } from '@erc725/erc725.js';
-
+import {
+  encodeValueContent,
+  //encodeValueType,
+  //encodeDataSourceWithHash,
+  //decodeDataSourceWithHash,
+} from '@erc725/erc725.js';
 //require("dotenv").config();
 
 //const minAmount = 1.0;
@@ -237,8 +242,15 @@ export function Donate({ selectedAddress }: DonateProps) {
     const writeContract = new ethers.Contract(contractAddress, contractABI, wallet);
 
     const totalSupply = await getTotalSupply();
+    console.log("totalSupply:", totalSupply);
     const newTokenId = totalSupply + 1;
-    const numberBytes32 = ethers.zeroPadValue('0x0' + BigInt(newTokenId).toString(16), 32);
+    console.log("newTokenId:", newTokenId);
+    //const numberBytes32 = ethers.zeroPadValue('0x0' + BigInt(newTokenId).toString(16), 32);
+    const numberBytes32 = encodeValueContent('Number', newTokenId);
+
+    console.log("numberBytes32:", numberBytes32);
+    //0x00000000000000000000000000000010
+    //0x0000000000000000000000000000000000000000000000000000000000000001
 
     console.log("Minting token with:", { image, name, uuid });
 
