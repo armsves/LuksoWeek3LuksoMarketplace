@@ -284,7 +284,7 @@ export function Donate({ selectedAddress }: DonateProps) {
 
   const [coverImage, setCoverImage] = useState<string>("");
   const [imageUploading, setImageUploading] = useState<boolean>(false);
-  const [blob, setBlob] = useState<any>(null);
+  const [setBlob] = useState<any>(null);
 
   return (
     <div className="w-full bg-white/80 backdrop-blur-md rounded-2xl">
