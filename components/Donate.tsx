@@ -40,12 +40,12 @@ import {
 
 //const minAmount = 1.0;
 //const maxAmount = 1000;
-/*
+
 interface DonateProps {
   selectedAddress?: `0x${string}` | null;
-}*/
+}
 
-export function Donate() {
+export function Donate( { selectedAddress }: DonateProps) {
   const {
     //client,
     //accounts,
@@ -60,7 +60,7 @@ export function Donate() {
   //const [isLoading, setIsLoading] = useState(false);
   const [tokensIdFrom, setTokensIdFrom] = useState<string[]>([]);
   const [connectedWalletAddress, setConnectedWalletAddress] = useState<string | null>(null);
-
+  console.log("Selected address:", selectedAddress);
   async function getConnectedWalletAddress() {
     const provider = new ethers.BrowserProvider((window as any).ethereum);
     const accounts = await provider.send("eth_accounts", []);
