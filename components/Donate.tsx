@@ -359,41 +359,37 @@ export function Donate({ selectedAddress }: DonateProps) {
 
   const handleList = async (tokenId: string) => {
     try {
-      /*
-      const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
-      const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY as `0x${string}`;
-      const wallet = new ethers.Wallet(privateKey, provider);
-      const writeContract = new ethers.Contract(listingsContractAddress, listingsContractABI, wallet);
-      */
-      //const provider = new ethers.BrowserProvider(window.ethereum); // Injected provider
       setIsListing(true)
+      const startTime = Number(1743597886)
+      const endTime = Number(1843597886)
+      const bytes32TokenId = encodeValueContent('Number', tokenId);
+      
       const provider = new ethers.BrowserProvider((window as any).ethereum);
       const accounts = await provider.send("eth_accounts", []);
-      if (accounts.length === 0) {
-        // Request accounts only if not already connected
-        await provider.send("eth_requestAccounts", []);
-      }
+      if (accounts.length === 0) { await provider.send("eth_requestAccounts", []); }
 
       const signer = await provider.getSigner();
       const writeContract = new ethers.Contract(listingsContractAddress, listingsContractABI, signer);
 
-      const startTime = Number(1743597886)
-      const endTime = Number(1843597886)
-      //const price = "777"
-      const bytes32TokenId = encodeValueContent('Number', tokenId);
-      console.log("Listing token with:", { contractAddress, bytes32TokenId, price, startTime, endTime });
+      const nftContract = new ethers.Contract(contractAddress, contractABI, signer);
 
+      const authorize = await nftContract.authorizeOperator(listingsContractAddress, bytes32TokenId, "0x");
+      await authorize.wait();
+      console.log("Operator authorized successfully:", authorize);
+      //console.log("Listing token with:", { contractAddress, bytes32TokenId, price, startTime, endTime });
 
       const response = await writeContract.list(contractAddress, bytes32TokenId, price, startTime, endTime);
-      response.wait(1); // Wait for the transaction to be mined
-      //response.wait(1); // Wait for the transaction to be mined
+      response.wait();
       console.log("Token listed successfully:", await response);
-      //setIsListed(true); // Update state to reflect the new status
-      window.location.reload();
+      setTokensInfo((prevTokensInfo) =>
+        prevTokensInfo.map((token) =>
+          token.id === tokenId ? { ...token, isListed: true, price: Number(price) } : token
+        )
+      );
     } catch (error) {
       console.error("Error listing token:", error);
     } finally {
-      setIsListing(false); // Hide loader
+      setIsListing(false);
     }
   };
 
@@ -423,7 +419,7 @@ export function Donate({ selectedAddress }: DonateProps) {
     } catch (error) {
       console.error("Error delisting token:", error);
     } finally {
-      setIsListing(false); // Hide loader
+      setIsListing(false);
     }
   };
 
@@ -665,13 +661,13 @@ export function Donate({ selectedAddress }: DonateProps) {
                       />
                     </div>
                   )}
-            
+
                   {/* Token Details */}
-                    <div className="p-4 items-center justify-center bg-white rounded-lg">
-                      <h3 className="text-lg font-semibold text-gray-900 font-mono text-center">T-shirts</h3>
-                      <p className="text-sm text-gray-500 font-mono text-center">#{token.id} - {token.name}</p>
-                    </div>
-            
+                  <div className="p-4 items-center justify-center bg-white rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-900 font-mono text-center">T-shirts</h3>
+                    <p className="text-sm text-gray-500 font-mono text-center">#{token.id} - {token.name}</p>
+                  </div>
+
                   {/* Action Buttons */}
                   <div className="flex justify-between items-center p-4 border-t border-gray-200">
                     {token.isListed ? (
