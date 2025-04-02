@@ -45,12 +45,12 @@ interface DonateProps {
   selectedAddress?: `0x${string}` | null;
 }
 
-export function Donate( { selectedAddress }: DonateProps) {
+export function Donate({ selectedAddress }: DonateProps) {
   const {
-    //client,
-    //accounts,
+    client,
+    accounts,
     contextAccounts,
-    //walletConnected 
+    walletConnected
   } = useUpProvider();
   //const [amount, setAmount] = useState<number>(minAmount);
   //const [error, setError] = useState("");
@@ -70,6 +70,11 @@ export function Donate( { selectedAddress }: DonateProps) {
     console.log("Connected wallet address:", address);
     setConnectedWalletAddress(address);
   }
+  console.log("client:", client);
+  console.log("accounts:", accounts);
+  console.log("Connected wallet address:", walletConnected);
+  console.log("contextAccounts:", contextAccounts);
+
 
   useEffect(() => {
     getConnectedWalletAddress();
@@ -145,7 +150,7 @@ export function Donate( { selectedAddress }: DonateProps) {
   const uidHash = "0x5549444861736800000000000000000000000000000000000000000000000000";
   const nftImage = "0x4e4654496d616765000000000000000000000000000000000000000000000000";
 
-  const tempAddress = connectedWalletAddress // || "0x82e45374a2cd9adc0e22ac32843bcf3ecb546148"
+  const tempAddress = contextAccounts[0] || "0x82e45374a2cd9adc0e22ac32843bcf3ecb546148"
   const network = [{
     luksoTestnet: {
       url: 'https://rpc.testnet.lukso.network',
@@ -210,12 +215,12 @@ export function Donate( { selectedAddress }: DonateProps) {
     //mint();
   })*/
 
-  async function getAssetMetadata() {
+  async function getAssetMetadata(tempAddress: string) {
     if (!tempAddress) {
       console.error("Temp address is not configured. Cannot fetch token IDs.");
       return;
     }
-        const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+    const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
     const readContract = new ethers.Contract(contractAddress, contractABI, provider);
 
     const tokensIdFrom = await readContract.tokenIdsOf(tempAddress);
@@ -368,8 +373,8 @@ export function Donate( { selectedAddress }: DonateProps) {
 
   useEffect(() => {
     console.log("contextAccounts[0]:", contextAccounts[0]);
-    getAssetMetadata();
-  }, [tempAddress]);
+    getAssetMetadata(contextAccounts[0]);
+  }, [contextAccounts[0]]);
 
   const [coverImage, setCoverImage] = useState<string>("");
   const [imageUploading, setImageUploading] = useState<boolean>(false);
@@ -543,7 +548,7 @@ export function Donate( { selectedAddress }: DonateProps) {
     console.log("connectedWalletAddress:", connectedWalletAddress);
     console.log("bytes32TokenId:", bytes32TokenId);
 
-    const authorize = await nftContract.transfer(owner, 
+    const authorize = await nftContract.transfer(owner,
       connectedWalletAddress,
       //listingsContractAddress, 
       bytes32TokenId, true, "0x");
