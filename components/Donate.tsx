@@ -164,10 +164,10 @@ export function Donate( { selectedAddress }: DonateProps) {
     name: string;
     hash: string;
     image: string | null;
-    isListed: boolean
-    owner?: string;
-    listingId?: number;
-    price?: number;
+    isListed: boolean;
+    owner: string;
+    listingId: number;
+    price: number;
   }[]>([]);
 
   const listingsContractAddress = "0xA509ea144D57Fc43b3123a70C682907d9Eff2E19";
@@ -781,7 +781,8 @@ export function Donate( { selectedAddress }: DonateProps) {
                             className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
                           >
                             Buy
-                          </button>)}
+                          </button>
+                        )}
                       </>
                     ) : (
                       <button
