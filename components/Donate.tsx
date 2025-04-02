@@ -59,7 +59,7 @@ export function Donate( { selectedAddress }: DonateProps) {
   //console.log("contextAccounts[0]:", contextAccounts[0]);
   //const [isLoading, setIsLoading] = useState(false);
   const [tokensIdFrom, setTokensIdFrom] = useState<string[]>([]);
-  const [connectedWalletAddress, setConnectedWalletAddress] = useState<string | null>(null);
+  const [connectedWalletAddress, setConnectedWalletAddress] = useState<string>("");
   console.log("Selected address:", selectedAddress);
   async function getConnectedWalletAddress() {
     const provider = new ethers.BrowserProvider((window as any).ethereum);
@@ -145,7 +145,7 @@ export function Donate( { selectedAddress }: DonateProps) {
   const uidHash = "0x5549444861736800000000000000000000000000000000000000000000000000";
   const nftImage = "0x4e4654496d616765000000000000000000000000000000000000000000000000";
 
-  const tempAddress = connectedWalletAddress// || "0x82e45374a2cd9adc0e22ac32843bcf3ecb546148"
+  const tempAddress = connectedWalletAddress // || "0x82e45374a2cd9adc0e22ac32843bcf3ecb546148"
   const network = [{
     luksoTestnet: {
       url: 'https://rpc.testnet.lukso.network',
@@ -203,15 +203,19 @@ export function Donate( { selectedAddress }: DonateProps) {
     return listing;
   }
 
+  /*
   useEffect(() => {
     isListedByTokenId(contractAddress, "0x0000000000000000000000000000000000000000000000000000000000000001");
     //getTotalSupply();
     //mint();
-  })
+  })*/
 
   async function getAssetMetadata() {
-    // Create a provider using the RPC URL
-    const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+    if (!tempAddress) {
+      console.error("Temp address is not configured. Cannot fetch token IDs.");
+      return;
+    }
+        const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
     const readContract = new ethers.Contract(contractAddress, contractABI, provider);
 
     const tokensIdFrom = await readContract.tokenIdsOf(tempAddress);
