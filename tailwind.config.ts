@@ -8,4 +8,11 @@ export default {
   ],
   plugins: [],
   presets: [require('@lukso/web-components/tailwind.config')],
+  theme: {
+    extend: {
+      fontFamily: {
+        mono: ['"IBM Plex Mono"', 'monospace'], // Add IBM Plex Mono font
+      },
+    },
+  },
 } satisfies Config;

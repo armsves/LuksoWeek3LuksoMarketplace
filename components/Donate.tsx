@@ -146,9 +146,54 @@ export function Donate({ selectedAddress }: DonateProps) {
     },
   }]
 
-  const [tokensInfo, setTokensInfo] = useState<
-    { id: string; name: string; hash: string; image: string | null }[]
-  >([]);
+  const [tokensInfo, setTokensInfo] = useState<{
+    id: string;
+    name: string;
+    hash: string;
+    image: string | null;
+    isListed: boolean
+    listingId?: number;
+    price?: number;
+  }[]>([]);
+
+  const listingsContractAddress = "0xA509ea144D57Fc43b3123a70C682907d9Eff2E19";
+  const listingsContractABI = [{ "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "AlreadyListed", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "bytes32", "name": "role", "type": "bytes32" }], "name": "IllegalAccess", "type": "error" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "InactiveListing", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "bytes32", "name": "tokenId", "type": "bytes32" }], "name": "InsufficientAuthorization", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }], "name": "InvalidAddress", "type": "error" }, { "inputs": [{ "internalType": "uint256", "name": "time", "type": "uint256" }], "name": "InvalidListingTime", "type": "error" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "NotListed", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "callerAddress", "type": "address" }], "name": "OwnableCallerNotTheOwner", "type": "error" }, { "inputs": [], "name": "OwnableCannotSetZeroAddressAsOwner", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }], "name": "UnathorizedSeller", "type": "error" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" }, { "indexed": true, "internalType": "address", "name": "asset", "type": "address" }], "name": "Delisted", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "uint8", "name": "version", "type": "uint8" }], "name": "Initialized", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" }, { "indexed": true, "internalType": "address", "name": "asset", "type": "address" }, { "indexed": false, "internalType": "address", "name": "seller", "type": "address" }, { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "bytes32", "name": "tokenId", "type": "bytes32" }, { "indexed": false, "internalType": "uint256", "name": "price", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "startTime", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "endTime", "type": "uint256" }], "name": "Listed", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }], "name": "OwnershipTransferred", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }], "name": "Paused", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" }, { "indexed": true, "internalType": "address", "name": "asset", "type": "address" }], "name": "Unlisted", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }], "name": "Unpaused", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" }, { "indexed": true, "internalType": "address", "name": "asset", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "price", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "startTime", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "endTime", "type": "uint256" }], "name": "Updated", "type": "event" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "delist", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "getListing", "outputs": [{ "components": [{ "internalType": "address", "name": "seller", "type": "address" }, { "internalType": "address", "name": "asset", "type": "address" }, { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "bytes32", "name": "tokenId", "type": "bytes32" }, { "internalType": "uint256", "name": "price", "type": "uint256" }, { "internalType": "uint256", "name": "startTime", "type": "uint256" }, { "internalType": "uint256", "name": "endTime", "type": "uint256" }], "internalType": "struct LSP8Listing", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }, { "internalType": "bytes32", "name": "tokenId", "type": "bytes32" }], "name": "getListingByTokenId", "outputs": [{ "components": [{ "internalType": "address", "name": "seller", "type": "address" }, { "internalType": "address", "name": "asset", "type": "address" }, { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "bytes32", "name": "tokenId", "type": "bytes32" }, { "internalType": "uint256", "name": "price", "type": "uint256" }, { "internalType": "uint256", "name": "startTime", "type": "uint256" }, { "internalType": "uint256", "name": "endTime", "type": "uint256" }], "internalType": "struct LSP8Listing", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }, { "internalType": "bytes32", "name": "tokenId", "type": "bytes32" }], "name": "getListingIdByTokenId", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "bytes32", "name": "role", "type": "bytes32" }], "name": "grantRole", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "bytes32", "name": "role", "type": "bytes32" }], "name": "hasRole", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "newOwner_", "type": "address" }], "name": "initialize", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "isActiveListing", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "isListed", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }, { "internalType": "bytes32", "name": "tokenId", "type": "bytes32" }], "name": "isListedByTokenId", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }, { "internalType": "bytes32", "name": "tokenId", "type": "bytes32" }, { "internalType": "uint256", "name": "price", "type": "uint256" }, { "internalType": "uint256", "name": "startTime", "type": "uint256" }, { "internalType": "uint256", "name": "secondsUntilEndTime", "type": "uint256" }], "name": "list", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "pause", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "paused", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "bytes32", "name": "role", "type": "bytes32" }], "name": "revokeRole", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "totalListings", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "unlist", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "unpause", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "uint256", "name": "price", "type": "uint256" }, { "internalType": "uint256", "name": "startTime", "type": "uint256" }, { "internalType": "uint256", "name": "secondsUntilEndTime", "type": "uint256" }], "name": "update", "outputs": [], "stateMutability": "nonpayable", "type": "function" }];
+
+  async function isListedByTokenId(asset: string, tokenId: string) {
+    // Create a provider using the RPC URL
+    const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+    const readContract = new ethers.Contract(listingsContractAddress, listingsContractABI, provider);
+
+    const isActiveListing = await readContract.isListedByTokenId(asset, tokenId);
+    console.log("isActiveListing:", isActiveListing);
+    return isActiveListing;
+  }
+
+  async function getListingByTokenId(asset: string, tokenId: string) {
+    // Create a provider using the RPC URL
+    const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+    const readContract = new ethers.Contract(listingsContractAddress, listingsContractABI, provider);
+
+    const listing = await readContract.getListingByTokenId(asset, tokenId);
+    console.log("getListingByTokenId:", listing);
+    return listing;
+  }
+
+  async function getListingIdByTokenId(asset: string, tokenId: string) {
+    // Create a provider using the RPC URL
+    const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+    const readContract = new ethers.Contract(listingsContractAddress, listingsContractABI, provider);
+
+    const listing = await readContract.getListingIdByTokenId(asset, tokenId);
+    console.log("getListingByTokenId:", listing);
+    return listing;
+  }
+
+  useEffect(() => {
+    isListedByTokenId(contractAddress, "0x0000000000000000000000000000000000000000000000000000000000000001");
+    //getTotalSupply();
+    //mint();
+  })
 
   async function getAssetMetadata() {
     // Create a provider using the RPC URL
@@ -162,6 +207,17 @@ export function Donate({ selectedAddress }: DonateProps) {
     if (tokensIdFrom.length > 0) {
       const tokensData = await Promise.all(
         tokensIdFrom.map(async (tokenId: any) => {
+          const isListed = await isListedByTokenId(contractAddress, tokenId);
+          let listingId
+          let listing
+          if (isListed) {
+            listingId = await getListingIdByTokenId(contractAddress, tokenId);
+            listing = await getListingByTokenId(contractAddress, tokenId);
+            console.log("Listing:", listing);
+            //console.log("Listing ID:", listingId);
+            //console.log("Token is listed:", tokenId);
+          }
+
           const tokenName = await readContract.getDataForTokenId(tokenId, readName);
           const sanitizedName = ethers.toUtf8String(tokenName).replace(/[^\x20-\x7E]/g, "").trim();
 
@@ -170,16 +226,19 @@ export function Donate({ selectedAddress }: DonateProps) {
           const sanitizedImage = ethers.toUtf8String(image).replace(/[^\x20-\x7E]/g, "").trim();
 
           return {
-            id: ethers.getBigInt(tokenId).toString(), // Convert tokenId to a readable number
+            id: ethers.getBigInt(tokenId).toString(),
             name: sanitizedName,
             hash,
             image: sanitizedImage,
+            isListed: isListed,
+            listingId: Number(listingId),
+            price: listing?.price,
           };
         })
       );
 
       setTokensInfo(tokensData);
-      console.log("tokensInfo:", tokensData);
+      //console.log("tokensInfo:", tokensData);
     }
   }
 
@@ -297,6 +356,163 @@ export function Donate({ selectedAddress }: DonateProps) {
   const [coverImage, setCoverImage] = useState<string>("");
   const [imageUploading, setImageUploading] = useState<boolean>(false);
   //const [setBlob] = useState<any>(null);
+
+  const handleList = async (tokenId: string) => {
+    try {
+      /*
+      const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+      const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY as `0x${string}`;
+      const wallet = new ethers.Wallet(privateKey, provider);
+      const writeContract = new ethers.Contract(listingsContractAddress, listingsContractABI, wallet);
+      */
+      //const provider = new ethers.BrowserProvider(window.ethereum); // Injected provider
+      setIsListing(true)
+      const provider = new ethers.BrowserProvider((window as any).ethereum);
+      const accounts = await provider.send("eth_accounts", []);
+      if (accounts.length === 0) {
+        // Request accounts only if not already connected
+        await provider.send("eth_requestAccounts", []);
+      }
+
+      const signer = await provider.getSigner();
+      const writeContract = new ethers.Contract(listingsContractAddress, listingsContractABI, signer);
+
+      const startTime = Number(1743597886)
+      const endTime = Number(1843597886)
+      //const price = "777"
+      const bytes32TokenId = encodeValueContent('Number', tokenId);
+      console.log("Listing token with:", { contractAddress, bytes32TokenId, price, startTime, endTime });
+
+
+      const response = await writeContract.list(contractAddress, bytes32TokenId, price, startTime, endTime);
+      response.wait(1); // Wait for the transaction to be mined
+      //response.wait(1); // Wait for the transaction to be mined
+      console.log("Token listed successfully:", await response);
+      //setIsListed(true); // Update state to reflect the new status
+      window.location.reload();
+    } catch (error) {
+      console.error("Error listing token:", error);
+    } finally {
+      setIsListing(false); // Hide loader
+    }
+  };
+
+  const handleDelist = async (tokenId: number) => {
+    try {
+      setIsListing(true);
+
+      const provider = new ethers.BrowserProvider((window as any).ethereum);
+      const accounts = await provider.send("eth_accounts", []);
+      if (accounts.length === 0) {
+        // Request accounts only if not already connected
+        await provider.send("eth_requestAccounts", []);
+      }
+      const signer = await provider.getSigner();
+      const writeContract = new ethers.Contract(listingsContractAddress, listingsContractABI, signer);
+
+      const response = await writeContract.delist(tokenId);
+      await response.wait(); // Wait for the transaction to be mined
+      console.log("Token delisted successfully:", response);
+
+      // Update the `isListed` property of the delisted token
+      setTokensInfo((prevTokensInfo) =>
+        prevTokensInfo.map((token) =>
+          token.listingId === tokenId ? { ...token, isListed: false } : token
+        )
+      );
+    } catch (error) {
+      console.error("Error delisting token:", error);
+    } finally {
+      setIsListing(false); // Hide loader
+    }
+  };
+
+  /*
+  type Listing = {
+    id: string;
+    asset: any;
+    seller: any;
+    owner: any;
+    tokenId: any;
+    price: string;
+    startTime: string;
+    endTime: string;
+  };
+
+  const [listingsData, setListingsData] = useState<Listing[]>([]);
+  const getListings = async () => {
+    // Create a provider using the RPC URL
+    const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+    const readContract = new ethers.Contract(listingsContractAddress, listingsContractABI, provider);
+
+    const totalListings = await readContract.totalListings();
+    console.log("Total Listings:", totalListings);
+
+    const listingsData = [];
+    for (let i = 1; i <= Number(totalListings); i++) {
+      try {
+        const listing = await readContract.getListing(i);
+        listingsData.push({
+          id: i.toString(),
+          asset: listing.asset,
+          seller: listing.seller,
+          owner: listing.owner,
+          tokenId: listing.tokenId,
+          price: listing.price.toString(),
+          startTime: listing.startTime.toString(),
+          endTime: listing.endTime.toString(),
+        });
+      } catch (error) {
+        console.error(`Error fetching listing ${i}:`, error);
+      }
+    }
+    setListingsData(listingsData);
+    console.log("Listings Data:", listingsData);
+  };
+
+  useEffect(() => {
+    //getListings();
+  }, []);*/
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTokenId, setModalTokenId] = useState<string | null>(null);
+  const [modalHash, setModalHash] = useState<string | null>(null);
+  const [price, setPrice] = useState<string>("");
+  const [uid, setUid] = useState<string>("");
+  const [isListing, setIsListing] = useState<boolean>(false);
+
+  const openModal = (tokenId: string, hash: string) => {
+    setModalTokenId(tokenId);
+    setModalHash(hash);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setPrice("");
+    setUid("");
+    setModalTokenId(null);
+  };
+
+  const handleSubmit = async () => {
+    if (!modalTokenId) return;
+
+    try {
+      // Hash the UID
+      const hashedUid = ethers.keccak256(ethers.toUtf8Bytes(uid));
+
+      if (hashedUid !== modalHash) {
+        alert("UID does not match the token's hash.");
+        return;
+      }
+
+      // Proceed to list the token
+      await handleList(modalTokenId);
+      closeModal();
+    } catch (error) {
+      console.error("Error during listing:", error);
+    }
+  };
 
   return (
     <div className="w-full max-w-[650px] bg-white/80 backdrop-blur-md rounded-2xl mx-auto">
@@ -429,33 +645,65 @@ export function Donate({ selectedAddress }: DonateProps) {
       {tokensIdFrom.length > 0 && (
         <>
           {tokensInfo.length > 0 && (
-            <div className="rounded-xl mb-4">
-              <p className="text-gray-700 font-semibold">Owned Tokens:</p>
+            <div className="grid grid-cols-1 gap-6">
               {tokensInfo.map((token, index) => (
-                <div key={index} className="bg-gray-100 p-4 rounded-lg mb-4">
+                <div
+                  key={index}
+                  className="bg-white shadow-md rounded-lg overflow-hidden"
+                >
+                  {/* Token Image */}
                   {token.image && (
-                    <Image
-                      src={token.image}
-                      width={100}
-                      height={100}
-                      alt="Token"
-                      className="w-16 h-16 rounded-full mb-2"
-                    />
-                  )}
-                  <div className="flex flex-row items-center justify-between">
-                    <p className="text-gray-900 font-semibold">Token ID:</p>
-                    <p className="text-gray-700">{token.id}</p>
-                  </div>
-                  <div className="flex flex-row items-center justify-between">
-                    <p className="text-gray-900 font-semibold">Name:</p>
-                    <span className="text-gray-700">{token.name}</span>
-                  </div>
-                  <div className="flex flex-row items-center justify-between">
-                    <p className="text-gray-900 font-semibold">Hash:</p>
-                    <span className="text-gray-700">
-                      {token.hash.slice(0, 3)}...{token.hash.slice(-4)}
-                    </span>                  
+                    <div className="relative w-full">
+                      <Image
+                        src={token.image}
+                        alt="Token"
+                        //layout="fill"
+                        width={346}
+                        height={393}
+                        objectFit="cover"
+                        className="rounded-t-lg"
+                      />
                     </div>
+                  )}
+            
+                  {/* Token Details */}
+                    <div className="p-4 items-center justify-center bg-white rounded-lg">
+                      <h3 className="text-lg font-semibold text-gray-900 font-mono text-center">T-shirts</h3>
+                      <p className="text-sm text-gray-500 font-mono text-center">#{token.id} - {token.name}</p>
+                    </div>
+            
+                  {/* Action Buttons */}
+                  <div className="flex justify-between items-center p-4 border-t border-gray-200">
+                    {token.isListed ? (
+                      <>
+                        <div>
+                          <p className="text-sm text-gray-500">Price:</p>
+                          <p className="text-lg font-semibold text-gray-900">
+                            {token.price}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (token?.listingId !== undefined) {
+                              handleDelist(token.listingId);
+                            } else {
+                              console.error("Listing ID is undefined");
+                            }
+                          }}
+                          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                        >
+                          Delist
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => openModal(token.id, token.hash)}
+                        className="bg-black text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-gray-800 font-mono"
+                      >
+                        Sell
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -464,6 +712,96 @@ export function Donate({ selectedAddress }: DonateProps) {
 
         </>
       )}
+
+      {isListing && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <Image src="/loader.png" width={150} height={150} alt="Loading..." className="w-16 h-16 animate-spin" />
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-lg font-semibold mb-4">List Token</h2>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-1">Price:</label>
+              <input
+                type="text"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="Enter price in wei"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-1">UID:</label>
+              <input
+                type="text"
+                value={uid}
+                onChange={(e) => setUid(e.target.value)}
+                placeholder="Enter UID"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={closeModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 mr-2"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/*
+      listingsData.length > 0 && (
+        <>
+          {tokensInfo.length > 0 && (
+            <div className="rounded-xl mb-4">
+              <p className="text-gray-700 font-semibold">Listed Tokens:</p>
+              {listingsData.map((token, index) => (
+                <div key={index} className="bg-gray-100 p-4 rounded-lg mb-4">
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="text-gray-900 font-semibold">Token ID:</p>
+                    <p className="text-gray-700">{token.id}</p>
+                  </div>
+
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="text-gray-900 font-semibold">Name:</p>
+                    <span className="text-gray-700">{token.seller}</span>
+                  </div>
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="text-gray-900 font-semibold">Price:</p>
+                    <span className="text-gray-700">{token.price}</span>
+                  </div>
+
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="text-gray-900 font-semibold">Start Time:</p>
+                    <span className="text-gray-700">{token.startTime}</span>
+                  </div>
+                  <div className="flex flex-row items-center justify-between">
+                    <p className="text-gray-900 font-semibold">End Time:</p>
+                    <span className="text-gray-700">{token.endTime}</span>
+                  </div>
+                  </div>
+              ))}
+                </div>
+              )}
+              <p className="text-sm text-gray-500">Total tokens: {tokensIdFrom.length}</p>
+
+            </>
+          )*/
+      }
+
       {
         /*
       <div className="rounded-xl">

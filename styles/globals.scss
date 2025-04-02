@@ -2,7 +2,8 @@ $font-file-path: '/assets/fonts';
 
 @use '@lukso/web-components/tools/sass/main.scss';
 @import '@fortawesome/fontawesome-free/css/all.css';
-
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+  
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
