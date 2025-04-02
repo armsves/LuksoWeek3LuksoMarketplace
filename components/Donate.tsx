@@ -40,27 +40,40 @@ import {
 
 //const minAmount = 1.0;
 //const maxAmount = 1000;
-
+/*
 interface DonateProps {
   selectedAddress?: `0x${string}` | null;
-}
+}*/
 
-export function Donate({ selectedAddress }: DonateProps) {
+export function Donate() {
   const {
-    //
-    // 
-    //client, 
-    //accounts, 
+    //client,
+    //accounts,
     contextAccounts,
     //walletConnected 
   } = useUpProvider();
   //const [amount, setAmount] = useState<number>(minAmount);
   //const [error, setError] = useState("");
-  const recipientAddress = selectedAddress || contextAccounts[0];
-  console.log("recipientAddress:", recipientAddress);
-  console.log("contextAccounts[0]:", contextAccounts[0]);
+  //const recipientAddress = selectedAddress || contextAccounts[0];
+  //console.log("recipientAddress:", recipientAddress);
+  //console.log("contextAccounts[0]:", contextAccounts[0]);
   //const [isLoading, setIsLoading] = useState(false);
   const [tokensIdFrom, setTokensIdFrom] = useState<string[]>([]);
+  const [connectedWalletAddress, setConnectedWalletAddress] = useState<string | null>(null);
+
+  async function getConnectedWalletAddress() {
+    const provider = new ethers.BrowserProvider((window as any).ethereum);
+    const accounts = await provider.send("eth_accounts", []);
+    if (accounts.length === 0) { await provider.send("eth_requestAccounts", []); }
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
+    console.log("Connected wallet address:", address);
+    setConnectedWalletAddress(address);
+  }
+
+  useEffect(() => {
+    getConnectedWalletAddress();
+  }, []);
   //const [tokenName, setTokenName] = useState<string>("");
   //const [tokenSymbol, setTokenSymbol] = useState<string>("");
   //const [tokenImage, setTokenImage] = useState<string | null>(null);
@@ -132,7 +145,7 @@ export function Donate({ selectedAddress }: DonateProps) {
   const uidHash = "0x5549444861736800000000000000000000000000000000000000000000000000";
   const nftImage = "0x4e4654496d616765000000000000000000000000000000000000000000000000";
 
-  const tempAddress = recipientAddress || "0x82e45374a2cd9adc0e22ac32843bcf3ecb546148"
+  const tempAddress = connectedWalletAddress// || "0x82e45374a2cd9adc0e22ac32843bcf3ecb546148"
   const network = [{
     luksoTestnet: {
       url: 'https://rpc.testnet.lukso.network',
@@ -152,6 +165,7 @@ export function Donate({ selectedAddress }: DonateProps) {
     hash: string;
     image: string | null;
     isListed: boolean
+    owner?: string;
     listingId?: number;
     price?: number;
   }[]>([]);
@@ -231,6 +245,7 @@ export function Donate({ selectedAddress }: DonateProps) {
             hash,
             image: sanitizedImage,
             isListed: isListed,
+            owner: listing?.owner,
             listingId: Number(listingId),
             price: listing?.price,
           };
@@ -308,7 +323,6 @@ export function Donate({ selectedAddress }: DonateProps) {
     const numberBytes32 = encodeValueContent('Number', newTokenId);
 
     console.log("numberBytes32:", numberBytes32);
-    //0x00000000000000000000000000000010
     //0x0000000000000000000000000000000000000000000000000000000000000001
 
     console.log("Minting token with:", { image, name, uuid });
@@ -363,7 +377,7 @@ export function Donate({ selectedAddress }: DonateProps) {
       const startTime = Number(1743597886)
       const endTime = Number(1843597886)
       const bytes32TokenId = encodeValueContent('Number', tokenId);
-      
+
       const provider = new ethers.BrowserProvider((window as any).ethereum);
       const accounts = await provider.send("eth_accounts", []);
       if (accounts.length === 0) { await provider.send("eth_requestAccounts", []); }
@@ -510,11 +524,85 @@ export function Donate({ selectedAddress }: DonateProps) {
     }
   };
 
+  const handleBuy = async (owner: string, id: number, price: number) => {
+    //try {
+    setIsListing(true);
+
+    const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+    const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY as `0x${string}`;
+    const wallet = new ethers.Wallet(privateKey, provider);
+    const nftContract = new ethers.Contract(contractAddress, contractABI, wallet);
+    const bytes32TokenId = encodeValueContent('Number', id);
+
+    console.log("owner:", owner);
+    console.log("listingsContractAddress:", listingsContractAddress);
+    console.log("connectedWalletAddress:", connectedWalletAddress);
+    console.log("bytes32TokenId:", bytes32TokenId);
+
+    const authorize = await nftContract.transfer(owner, 
+      connectedWalletAddress,
+      //listingsContractAddress, 
+      bytes32TokenId, true, "0x");
+    await authorize.wait();
+    console.log("price is", price);
+
+    setIsListing(false);
+    /*
+    const provider = new ethers.BrowserProvider((window as any).ethereum);
+    const accounts = await provider.send("eth_accounts", []);
+    if (accounts.length === 0) {
+      // Request accounts only if not already connected
+      await provider.send("eth_requestAccounts", []);
+    }
+ 
+    const signer = await provider.getSigner();
+    const writeContract = new ethers.Contract(listingsContractAddress, listingsContractABI, signer);
+ 
+    console.log("Buying token with listing ID:", listingId, "and price:", price);
+ 
+    // Call the `buy` function on the smart contract
+    const response = await writeContract.buy(listingId, {
+      value: ethers.parseUnits(price.toString(), "wei"), // Send the payment in wei
+    });
+    await response.wait(); // Wait for the transaction to be mined
+    */
+    /*
+     if (!client) {
+       return;
+     }
+
+     setIsListing(true);
+     const tx = await client.sendTransaction({
+       account: accounts[0] as `0x${string}`,
+       to: recipientAddress as `0x${string}`,
+       value: parseUnits(price.toString(), 18),
+       chain: client.chain,
+     });
+
+     // Wait for transaction confirmation
+     await waitForTransactionReceipt(client, { hash: tx });
+     console.log("Transaction confirmed:", tx);
+     //console.log("Token purchased successfully:", response);
+ 
+     // Update the frontend state to reflect the purchase
+     setTokensInfo((prevTokensInfo) =>
+       prevTokensInfo.map((token) =>
+         token.listingId === listingId ? { ...token, isListed: false } : token
+       )
+     );
+   } catch (error) {
+     console.error("Error buying token:", error);
+   } finally {
+     setIsListing(false);
+   }
+   */
+  };
+
   return (
     <div className="w-full max-w-[650px] bg-white/80 backdrop-blur-md rounded-2xl mx-auto">
       <div className="rounded-xl mb-4">
         <p className="text-gray-700 font-semibold">UP Address:</p>
-        <p className="text-gray-900">{recipientAddress}</p>
+        <p className="text-gray-900">{connectedWalletAddress}</p>
       </div>
 
       <form onSubmit={handleMint} className="space-y-4">
@@ -641,13 +729,12 @@ export function Donate({ selectedAddress }: DonateProps) {
       {tokensIdFrom.length > 0 && (
         <>
           {tokensInfo.length > 0 && (
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-6 mt-4">
               {tokensInfo.map((token, index) => (
                 <div
                   key={index}
                   className="bg-white shadow-md rounded-lg overflow-hidden"
                 >
-                  {/* Token Image */}
                   {token.image && (
                     <div className="relative w-full">
                       <Image
@@ -662,22 +749,19 @@ export function Donate({ selectedAddress }: DonateProps) {
                     </div>
                   )}
 
-                  {/* Token Details */}
                   <div className="p-4 items-center justify-center bg-white rounded-lg">
                     <h3 className="text-lg font-semibold text-gray-900 font-mono text-center">T-shirts</h3>
                     <p className="text-sm text-gray-500 font-mono text-center">#{token.id} - {token.name}</p>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex justify-between items-center p-4 border-t border-gray-200">
                     {token.isListed ? (
                       <>
                         <div>
                           <p className="text-sm text-gray-500">Price:</p>
-                          <p className="text-lg font-semibold text-gray-900">
-                            {token.price}
-                          </p>
+                          <p className="text-lg font-semibold text-gray-900">{token.price}</p>
                         </div>
+
                         <button
                           onClick={() => {
                             if (token?.listingId !== undefined) {
@@ -690,6 +774,14 @@ export function Donate({ selectedAddress }: DonateProps) {
                         >
                           Delist
                         </button>
+
+                        {token.owner && (
+                          <button
+                            onClick={() => handleBuy(token.owner, Number(token.id), Number(token.price))}
+                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                          >
+                            Buy
+                          </button>)}
                       </>
                     ) : (
                       <button
@@ -705,7 +797,6 @@ export function Donate({ selectedAddress }: DonateProps) {
             </div>
           )}
           <p className="text-sm text-gray-500">Total tokens: {tokensIdFrom.length}</p>
-
         </>
       )}
 
@@ -715,7 +806,6 @@ export function Donate({ selectedAddress }: DonateProps) {
         </div>
       )}
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -808,37 +898,6 @@ export function Donate({ selectedAddress }: DonateProps) {
         */
       }
 
-      {/* Amount Input and Donate Button Section */}
-      {
-      /*
-      <div className="flex gap-2">
-        <div className="flex-1">
-          <lukso-input
-            value={minAmount.toString()}
-            type="number"
-            min={minAmount}
-            max={maxAmount}
-            onInput={handleOnInput}
-            is-full-width
-            is-disabled={!walletConnected}
-            className="mt-2"
-          />
-          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-        </div>
-
-        <lukso-button
-          onClick={sendToken}
-          onKeyPress={sendTokenKeyPress}
-          variant="primary"
-          size="medium"
-          className="mt-2"
-          isLoading={isLoading}
-          disabled={!walletConnected}
-        >
-          {`Donate ${amount} LYX`}
-        </lukso-button>
-      </div>
-      */}
     </div>
   );
 }
