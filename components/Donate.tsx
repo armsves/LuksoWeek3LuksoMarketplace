@@ -497,9 +497,10 @@ export function Donate({ selectedAddress }: DonateProps) {
   const [modalTokenId, setModalTokenId] = useState<string | null>(null);
   const [modalHash, setModalHash] = useState<string | null>(null);
   const [price, setPrice] = useState<string>("");
-  const [uid, setUid] = useState<string>("");
+  const [uid, setUid] = useState<string>("100");
   const [isListing, setIsListing] = useState<boolean>(false);
 
+  console.log(modalHash)
   const openModal = (tokenId: string, hash: string) => {
     setModalTokenId(tokenId);
     setModalHash(hash);
@@ -519,11 +520,12 @@ export function Donate({ selectedAddress }: DonateProps) {
     try {
       // Hash the UID
       const hashedUid = ethers.keccak256(ethers.toUtf8Bytes(uid));
-
+      console.log("hashedUid:", hashedUid);
+      /*
       if (hashedUid !== modalHash) {
         alert("UID does not match the token's hash.");
         return;
-      }
+      }*/
 
       // Proceed to list the token
       await handleList(modalTokenId);
@@ -534,28 +536,35 @@ export function Donate({ selectedAddress }: DonateProps) {
   };
 
   const handleBuy = async (owner: string, id: number, price: number) => {
-    //try {
     setIsListing(true);
+    try {
+      const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
+      const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY as `0x${string}`;
+      const wallet = new ethers.Wallet(privateKey, provider);
+      const nftContract = new ethers.Contract(contractAddress, contractABI, wallet);
+      const bytes32TokenId = encodeValueContent('Number', id);
+  
+      console.log("owner:", owner);
+      console.log("listingsContractAddress:", listingsContractAddress);
+      console.log("connectedWalletAddress:", connectedWalletAddress);
+      console.log("bytes32TokenId:", bytes32TokenId);
+  
+      const authorize = await nftContract.transfer(
+        owner,
+        connectedWalletAddress,
+        //listingsContractAddress, 
+        bytes32TokenId, true, "0x"
+      );
+      await authorize.wait();
+      console.log("price is", price);
+    } catch (error) {
+      console.error("Error buying token:", error);
+      alert("Failed to buy token: " + (error as Error).message);
+      setIsListing(false);
+    } finally {
+      setIsListing(false);
+    }
 
-    const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
-    const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY as `0x${string}`;
-    const wallet = new ethers.Wallet(privateKey, provider);
-    const nftContract = new ethers.Contract(contractAddress, contractABI, wallet);
-    const bytes32TokenId = encodeValueContent('Number', id);
-
-    console.log("owner:", owner);
-    console.log("listingsContractAddress:", listingsContractAddress);
-    console.log("connectedWalletAddress:", connectedWalletAddress);
-    console.log("bytes32TokenId:", bytes32TokenId);
-
-    const authorize = await nftContract.transfer(owner,
-      connectedWalletAddress,
-      //listingsContractAddress, 
-      bytes32TokenId, true, "0x");
-    await authorize.wait();
-    console.log("price is", price);
-
-    setIsListing(false);
     /*
     const provider = new ethers.BrowserProvider((window as any).ethereum);
     const accounts = await provider.send("eth_accounts", []);
@@ -833,10 +842,11 @@ export function Donate({ selectedAddress }: DonateProps) {
                     type="text"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    placeholder="Enter price in wei"
+                    placeholder="Enter price in LYX"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
+                {/* 
                 <div className="mb-4">
                   <label className="block text-gray-700 font-semibold mb-1">UID:</label>
                   <input
@@ -847,6 +857,8 @@ export function Donate({ selectedAddress }: DonateProps) {
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
+                */}
+
                 <div className="flex justify-end">
                   <button
                     onClick={closeModal}
