@@ -697,7 +697,7 @@ export function Donate({ selectedAddress }: DonateProps) {
         {/* Name Input */}
         <div>
           <label className="block text-gray-700 font-semibold mb-1">
-            Token Name:
+            Product Name:
           </label>
           <input
             type="text"
@@ -712,13 +712,13 @@ export function Donate({ selectedAddress }: DonateProps) {
         {/* UUID Input */}
         <div>
           <label className="block text-gray-700 font-semibold mb-1">
-            UUID:
+            Product Price in LYX:
           </label>
           <input
             type="text"
             value={uuid}
             onChange={(e) => setUuid(e.target.value)}
-            placeholder="Enter UUID"
+            placeholder="Enter Price in LYX"
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -730,7 +730,7 @@ export function Donate({ selectedAddress }: DonateProps) {
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
           >
-            Mint
+            Publish
           </button>
         </div>
       </form>
