@@ -1,7 +1,7 @@
 "use client";
 
 import { UpProvider } from "@/components/upProvider";
-import { Donate } from "@/components/Donate";
+import { Marketplace } from "@/components/Marketplace";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { useUpProvider } from "@/components/upProvider";
 import { useState, useEffect } from "react";
@@ -12,14 +12,6 @@ if (typeof window !== "undefined") {
   promise = import("@lukso/web-components");
 }
 
-/**
- * Main content component that handles the conditional rendering of Donate and ProfileSearch components.
- * Utilizes the UpProvider context to manage selected addresses and search state.
- *
- * @component
- * @returns {JSX.Element} A component that toggles between Donate and ProfileSearch views
- * based on the isSearching state from UpProvider.
- */
 function MainContent() {
   const [mounted, setMounted] = useState(false);
 
@@ -39,7 +31,7 @@ function MainContent() {
   return (
     <>
       <div className={`${isSearching ? "hidden" : "block"}`}>
-        <Donate selectedAddress={selectedAddress} />
+        <Marketplace selectedAddress={selectedAddress} />
       </div>
 
       <div className={`${!isSearching ? "hidden" : "block"}`}>

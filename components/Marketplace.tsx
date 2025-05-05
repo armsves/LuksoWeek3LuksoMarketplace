@@ -1,21 +1,3 @@
-/**
- * A component that facilitates LYX token transfers to a specified LUKSO address.
- *
- * @component
- * @param {Object} props - Component props
- * @param {string} [props.selectedAddress] - Optional hex address of the donation recipient.
- *                                          If not provided, uses the first address from context.
- *
- * Features:
- * - Amount validation (${minAmount}-${maxAmount} LYX)
- * - Integration with UP Browser wallet
- * - Recipient profile display using LuksoProfile
- * - Real-time amount validation
- *
- * @requires useUpProvider - Hook for UP Browser wallet integration
- * @requires LuksoProfile - Component for displaying LUKSO profile information
- * @requires viem - For handling blockchain transactions
- */
 "use client";
 
 import {
@@ -41,11 +23,11 @@ import {
 //const minAmount = 1.0;
 //const maxAmount = 1000;
 
-interface DonateProps {
+interface MarketplaceProps {
   selectedAddress?: `0x${string}` | null;
 }
 
-export function Donate({ selectedAddress }: DonateProps) {
+export function Marketplace({ selectedAddress }: MarketplaceProps) {
   const {
     client,
     accounts,
@@ -800,7 +782,7 @@ export function Donate({ selectedAddress }: DonateProps) {
                               Delist
                             </button>
 
-                            {token.owner && (
+                            {token.owner && token.owner !== connectedWalletAddress && (
                               <button
                                 onClick={() => handleBuy(token.owner, Number(token.id), Number(token.price))}
                                 className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
