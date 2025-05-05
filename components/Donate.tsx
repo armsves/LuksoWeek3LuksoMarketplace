@@ -607,15 +607,22 @@ export function Donate({ selectedAddress }: DonateProps) {
    */
   };
 
+
   return (
     <div className="w-full max-w-[650px] bg-white/80 backdrop-blur-md rounded-2xl mx-auto">
-      <div className="rounded-xl mb-4">
-        <p className="text-gray-700 font-semibold">UP Address:</p>
-        <p className="text-gray-900">{connectedWalletAddress} or {contextAccounts[0]}</p>
-      </div>
+      {!connectedWalletAddress ? (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-lg text-red-600 font-semibold">Please connect your wallet.</p>
+        </div>
+      ) : (
+        <>
+          <div className="rounded-xl mb-4">
+            <p className="text-gray-700 font-semibold">UP Address:</p>
+            <p className="text-gray-900">{connectedWalletAddress} or {contextAccounts[0]}</p>
+          </div>
 
-      <form onSubmit={handleMint} className="space-y-4">
-        {/* Image Input 
+          <form onSubmit={handleMint} className="space-y-4">
+            {/* Image Input 
         <div>
           <label className="block text-gray-700 font-semibold mb-1">
             Image URL:
@@ -629,236 +636,236 @@ export function Donate({ selectedAddress }: DonateProps) {
             required
           />
         </div>*/}
-        <div className="rounded">
-          <label className="cursor-pointer w-full h-full">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                try {
-                  if (!e.target.files || e.target.files.length === 0) {
-                    console.error("No file selected");
-                    return;
-                  }
-                  const file = e.target.files[0];
-                  console.log("Selected file:", file);
+            <div className="rounded">
+              <label className="cursor-pointer w-full h-full">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    try {
+                      if (!e.target.files || e.target.files.length === 0) {
+                        console.error("No file selected");
+                        return;
+                      }
+                      const file = e.target.files[0];
+                      console.log("Selected file:", file);
 
-                  setImageUploading(true);
+                      setImageUploading(true);
 
-                  const response = await fetch(
-                    `/api/upload?filename=${file.name}`,
-                    { method: 'POST', body: file }
-                  );
+                      const response = await fetch(
+                        `/api/upload?filename=${file.name}`,
+                        { method: 'POST', body: file }
+                      );
 
-                  if (!response.ok) {
-                    console.error('Upload failed:', response.statusText);
-                    setImageUploading(false);
-                    return;
-                  }
+                      if (!response.ok) {
+                        console.error('Upload failed:', response.statusText);
+                        setImageUploading(false);
+                        return;
+                      }
 
-                  const newBlob = await response.json();
-                  console.log("Uploaded file response:", newBlob);
-                  console.log("Uploaded file URL:", newBlob.url);
-                  setCoverImage(newBlob.url);
-                } catch (error) {
-                  console.error("Error during file upload:", error);
-                } finally {
-                  setImageUploading(false);
-                }
-              }}
-              //disabled={imageUploading}
-              className="opacity-0 w-full h-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      const newBlob = await response.json();
+                      console.log("Uploaded file response:", newBlob);
+                      console.log("Uploaded file URL:", newBlob.url);
+                      setCoverImage(newBlob.url);
+                    } catch (error) {
+                      console.error("Error during file upload:", error);
+                    } finally {
+                      setImageUploading(false);
+                    }
+                  }}
+                  //disabled={imageUploading}
+                  className="opacity-0 w-full h-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 
-            //className="opacity-0 w-full h-full absolute inset-0"
-            />
-            {imageUploading ? (
-              <div className="flex gap-2 items-center justify-center text-2xl">
-                Uploading Product Image
-                <i className="fas fa-camera rotate"></i>
-              </div>
-            ) : (
-              <>
-                {coverImage ? (
-                  <div className="relative w-full h-full">{coverImage}
-                    <Image src={coverImage} alt="uploaded image" fill className="rounded ring-1 ring-gray-900/5 cover" />
+                //className="opacity-0 w-full h-full absolute inset-0"
+                />
+                {imageUploading ? (
+                  <div className="flex gap-2 items-center justify-center text-2xl">
+                    Uploading Product Image
+                    <i className="fas fa-camera rotate"></i>
                   </div>
                 ) : (
-                  <div className="flex gap-2 items-center justify-center text-2xl">
-                    Product Image
-                    <i className="fas fa-camera"></i>
-                  </div>
-                )}
-              </>
-            )}
-
-          </label>
-        </div>
-
-        {/* Name Input */}
-        <div>
-          <label className="block text-gray-700 font-semibold mb-1">
-            Product Name:
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter token name"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        {/* UUID Input */}
-        <div>
-          <label className="block text-gray-700 font-semibold mb-1">
-            Product ID:
-          </label>
-          <input
-            type="text"
-            value={uuid}
-            onChange={(e) => setUuid(e.target.value)}
-            placeholder="Enter Product ID"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          >
-            Publish
-          </button>
-        </div>
-      </form>
-
-      {tokensIdFrom.length > 0 && (
-        <>
-          {tokensInfo.length > 0 && (
-            <div className="grid grid-cols-1 gap-6 mt-4">
-              {tokensInfo.map((token, index) => (
-                <div
-                  key={index}
-                  className="bg-white shadow-md rounded-lg overflow-hidden"
-                >
-                  {token.image && (
-                    <div className="relative w-full">
-                      <Image
-                        src={token.image}
-                        alt="Token"
-                        //layout="fill"
-                        width={346}
-                        height={393}
-                        objectFit="cover"
-                        className="rounded-t-lg"
-                      />
-                    </div>
-                  )}
-
-                  <div className="p-4 items-center justify-center bg-white rounded-lg">
-                    <h3 className="text-lg font-semibold text-gray-900 font-mono text-center">T-shirts</h3>
-                    <p className="text-sm text-gray-500 font-mono text-center">#{token.id} - {token.name}</p>
-                  </div>
-
-                  <div className="flex justify-between items-center p-4 border-t border-gray-200">
-                    {token.isListed ? (
-                      <>
-                        <div>
-                          <p className="text-sm text-gray-500">Price:</p>
-                          <p className="text-lg font-semibold text-gray-900">{token.price} LYX</p>
-                        </div>
-
-                        <button
-                          onClick={() => {
-                            if (token?.listingId !== undefined) {
-                              handleDelist(token.listingId);
-                            } else {
-                              console.error("Listing ID is undefined");
-                            }
-                          }}
-                          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                        >
-                          Delist
-                        </button>
-
-                        {token.owner && (
-                          <button
-                            onClick={() => handleBuy(token.owner, Number(token.id), Number(token.price))}
-                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-                          >
-                            Buy
-                          </button>
-                        )}
-                      </>
+                  <>
+                    {coverImage ? (
+                      <div className="relative w-full h-full">{coverImage}
+                        <Image src={coverImage} alt="uploaded image" fill className="rounded ring-1 ring-gray-900/5 cover" />
+                      </div>
                     ) : (
-                      <button
-                        onClick={() => openModal(token.id, token.hash)}
-                        className="bg-black text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-gray-800 font-mono"
-                      >
-                        Sell
-                      </button>
+                      <div className="flex gap-2 items-center justify-center text-2xl">
+                        Product Image
+                        <i className="fas fa-camera"></i>
+                      </div>
                     )}
-                  </div>
-                </div>
-              ))}
+                  </>
+                )}
+
+              </label>
             </div>
-          )}
-          <p className="text-sm text-gray-500">Total tokens: {tokensIdFrom.length}</p>
-        </>
-      )}
 
-      {isListing && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <Image src="/loader.png" width={150} height={150} alt="Loading..." className="w-16 h-16 animate-spin" />
-        </div>
-      )}
-
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-semibold mb-4">List Product</h2>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-1">Price:</label>
+            {/* Name Input */}
+            <div>
+              <label className="block text-gray-700 font-semibold mb-1">
+                Product Name:
+              </label>
               <input
                 type="text"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="Enter price in wei"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter token name"
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-1">UID:</label>
+
+            {/* UUID Input */}
+            <div>
+              <label className="block text-gray-700 font-semibold mb-1">
+                Product ID:
+              </label>
               <input
                 type="text"
-                value={uid}
-                onChange={(e) => setUid(e.target.value)}
-                placeholder="Enter UID"
+                value={uuid}
+                onChange={(e) => setUuid(e.target.value)}
+                placeholder="Enter Product ID"
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
             </div>
-            <div className="flex justify-end">
+
+            {/* Submit Button */}
+            <div>
               <button
-                onClick={closeModal}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 mr-2"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
+                type="submit"
                 className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
               >
-                Submit
+                Publish
               </button>
             </div>
-          </div>
-        </div>
-      )}
+          </form>
 
-      {/*
+          {tokensIdFrom.length > 0 && (
+            <>
+              {tokensInfo.length > 0 && (
+                <div className="grid grid-cols-1 gap-6 mt-4">
+                  {tokensInfo.map((token, index) => (
+                    <div
+                      key={index}
+                      className="bg-white shadow-md rounded-lg overflow-hidden"
+                    >
+                      {token.image && (
+                        <div className="relative w-full">
+                          <Image
+                            src={token.image}
+                            alt="Token"
+                            //layout="fill"
+                            width={346}
+                            height={393}
+                            objectFit="cover"
+                            className="rounded-t-lg"
+                          />
+                        </div>
+                      )}
+
+                      <div className="p-4 items-center justify-center bg-white rounded-lg">
+                        <h3 className="text-lg font-semibold text-gray-900 font-mono text-center">T-shirts</h3>
+                        <p className="text-sm text-gray-500 font-mono text-center">#{token.id} - {token.name}</p>
+                      </div>
+
+                      <div className="flex justify-between items-center p-4 border-t border-gray-200">
+                        {token.isListed ? (
+                          <>
+                            <div>
+                              <p className="text-sm text-gray-500">Price:</p>
+                              <p className="text-lg font-semibold text-gray-900">{token.price} LYX</p>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                if (token?.listingId !== undefined) {
+                                  handleDelist(token.listingId);
+                                } else {
+                                  console.error("Listing ID is undefined");
+                                }
+                              }}
+                              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                            >
+                              Delist
+                            </button>
+
+                            {token.owner && (
+                              <button
+                                onClick={() => handleBuy(token.owner, Number(token.id), Number(token.price))}
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                              >
+                                Buy
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => openModal(token.id, token.hash)}
+                            className="bg-black text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-gray-800 font-mono"
+                          >
+                            Sell
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-sm text-gray-500">Total tokens: {tokensIdFrom.length}</p>
+            </>
+          )}
+
+          {isListing && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <Image src="/loader.png" width={150} height={150} alt="Loading..." className="w-16 h-16 animate-spin" />
+            </div>
+          )}
+
+          {isModalOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <h2 className="text-lg font-semibold mb-4">List Product</h2>
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-1">Price:</label>
+                  <input
+                    type="text"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="Enter price in wei"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-1">UID:</label>
+                  <input
+                    type="text"
+                    value={uid}
+                    onChange={(e) => setUid(e.target.value)}
+                    placeholder="Enter UID"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={closeModal}
+                    className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 mr-2"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/*
       listingsData.length > 0 && (
         <>
           {tokensInfo.length > 0 && (
@@ -896,18 +903,19 @@ export function Donate({ selectedAddress }: DonateProps) {
 
             </>
           )*/
-      }
+          }
 
-      {
-        /*
-      <div className="rounded-xl">
-        <div className="flex flex-row items-center justify-center gap-2">
-          <LuksoProfile address={recipientAddress} />
-        </div>
-      </div>
-        */
-      }
-
+          {
+            /*
+          <div className="rounded-xl">
+            <div className="flex flex-row items-center justify-center gap-2">
+              <LuksoProfile address={recipientAddress} />
+            </div>
+          </div>
+            */
+          }
+        </>
+      )}
     </div>
   );
 }
