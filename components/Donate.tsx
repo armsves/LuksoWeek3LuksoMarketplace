@@ -74,7 +74,7 @@ export function Donate({ selectedAddress }: DonateProps) {
   console.log("accounts:", accounts);
   console.log("Connected wallet address:", walletConnected);
   console.log("contextAccounts:", contextAccounts);
-
+  console.log("contextAccounts[0]:", contextAccounts[0]);
 
   useEffect(() => {
     getConnectedWalletAddress();
@@ -611,7 +611,7 @@ export function Donate({ selectedAddress }: DonateProps) {
     <div className="w-full max-w-[650px] bg-white/80 backdrop-blur-md rounded-2xl mx-auto">
       <div className="rounded-xl mb-4">
         <p className="text-gray-700 font-semibold">UP Address:</p>
-        <p className="text-gray-900">{connectedWalletAddress}</p>
+        <p className="text-gray-900">{connectedWalletAddress} or {contextAccounts[0]}</p>
       </div>
 
       <form onSubmit={handleMint} className="space-y-4">
@@ -712,13 +712,13 @@ export function Donate({ selectedAddress }: DonateProps) {
         {/* UUID Input */}
         <div>
           <label className="block text-gray-700 font-semibold mb-1">
-            Product Price in LYX:
+            Product ID:
           </label>
           <input
             type="text"
             value={uuid}
             onChange={(e) => setUuid(e.target.value)}
-            placeholder="Enter Price in LYX"
+            placeholder="Enter Product ID"
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -768,7 +768,7 @@ export function Donate({ selectedAddress }: DonateProps) {
                       <>
                         <div>
                           <p className="text-sm text-gray-500">Price:</p>
-                          <p className="text-lg font-semibold text-gray-900">{token.price}</p>
+                          <p className="text-lg font-semibold text-gray-900">{token.price} LYX</p>
                         </div>
 
                         <button
@@ -819,7 +819,7 @@ export function Donate({ selectedAddress }: DonateProps) {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-semibold mb-4">List Token</h2>
+            <h2 className="text-lg font-semibold mb-4">List Product</h2>
             <div className="mb-4">
               <label className="block text-gray-700 font-semibold mb-1">Price:</label>
               <input
