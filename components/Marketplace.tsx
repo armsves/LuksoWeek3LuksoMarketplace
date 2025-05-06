@@ -1,10 +1,10 @@
 "use client";
 
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useUpProvider } from "./upProvider";
 import { ethers } from 'ethers';
 import Image from "next/image";
-import { encodeValueContent,} from '@erc725/erc725.js';
+import { encodeValueContent, } from '@erc725/erc725.js';
 
 interface MarketplaceProps {
   selectedAddress?: `0x${string}` | null;
@@ -90,7 +90,7 @@ export function Marketplace({ selectedAddress }: MarketplaceProps) {
   useEffect(() => {
     getConnectedWalletAddress();
   }, []);
-  
+
   async function isListedByTokenId(asset: string, tokenId: string) {
     // Create a provider using the RPC URL
     const provider = new ethers.JsonRpcProvider(network[0].luksoTestnet.url);
@@ -176,7 +176,7 @@ export function Marketplace({ selectedAddress }: MarketplaceProps) {
     return Number(totalSupply);
   }
 
-  
+
   const handleMint = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent the form from refreshing the page
 
@@ -301,8 +301,6 @@ export function Marketplace({ selectedAddress }: MarketplaceProps) {
     }
   };
 
-
-
   const handleSubmit = async () => {
     if (!modalTokenId) return;
 
@@ -325,12 +323,12 @@ export function Marketplace({ selectedAddress }: MarketplaceProps) {
       const wallet = new ethers.Wallet(privateKey, provider);
       const nftContract = new ethers.Contract(contractAddress, contractABI, wallet);
       const bytes32TokenId = encodeValueContent('Number', id);
-  
+
       console.log("owner:", owner);
       console.log("listingsContractAddress:", listingsContractAddress);
       console.log("connectedWalletAddress:", connectedWalletAddress);
       console.log("bytes32TokenId:", bytes32TokenId);
-  
+
       const authorize = await nftContract.transfer(
         owner,
         connectedWalletAddress,
@@ -501,6 +499,7 @@ export function Marketplace({ selectedAddress }: MarketplaceProps) {
                               <p className="text-lg font-semibold text-gray-900">{token.price} LYX</p>
                             </div>
 
+                            {token.owner && token.owner == connectedWalletAddress && (
                             <button
                               onClick={() => {
                                 if (token?.listingId !== undefined) {
@@ -513,6 +512,7 @@ export function Marketplace({ selectedAddress }: MarketplaceProps) {
                             >
                               Delist
                             </button>
+                            )}
 
                             {token.owner && token.owner !== connectedWalletAddress && (
                               <button
@@ -524,19 +524,23 @@ export function Marketplace({ selectedAddress }: MarketplaceProps) {
                             )}
                           </>
                         ) : (
-                          <button
-                            onClick={() => openModal(token.id, token.hash)}
-                            className="bg-black text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-gray-800 font-mono"
-                          >
-                            Sell
-                          </button>
+                          <>
+                            {token.owner && token.owner == connectedWalletAddress && (
+                              <button
+                                onClick={() => openModal(token.id, token.hash)}
+                                className="bg-black text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-gray-800 font-mono"
+                              >
+                                Sell
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-              <p className="text-sm text-gray-500">Total tokens: {tokensIdFrom.length}</p>
+              <p className="text-sm text-gray-500">Total products: {tokensIdFrom.length}</p>
             </>
           )}
 
